@@ -16,11 +16,18 @@ Requires Java 21 or newer.
 mvn verify
 ```
 
-## Seeing a violation
+## Seeing the rules fail
 
-Replace `Instant.now(clock)` with `Instant.now()` in `OrderService` and run `mvn verify` again:
+The `violations` profile adds code that takes the shortcuts the rules are meant to catch, one class per rule.
+It lives in `src/violations/java` and `src/violations-test/java`, and is only compiled when the profile is active:
+
+```shell
+mvn verify -Pviolations
+```
+
+The build fails, and every rule reports what is wrong and why, for example:
 
 ```text
 Architecture Violation [Priority: MEDIUM] - Rule 'no classes should access the system clock directly, because time should be retrieved using the injected java.time.Clock' was violated (1 times):
-Method <com.jdriven.example.order.OrderService.complete(java.lang.String)> calls method <java.time.Instant.now()> in (OrderService.java:20)
+Method <com.jdriven.example.order.OrderReport.generatedAt()> calls method <java.time.Instant.now()> in (OrderReport.java:9)
 ```
