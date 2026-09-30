@@ -61,11 +61,17 @@ class ArchitectureTest {
 
     // 5. Don't bypass security
     @ArchTest
-    static final ArchRule jwt_libraries_only_in_security = noClasses()
+    static final ArchRule security_apis_only_in_security = noClasses()
         .that().resideOutsideOfPackage("..security..")
         .should().dependOnClassesThat()
-        .resideInAnyPackage("io.jsonwebtoken..", "com.auth0.jwt..", "com.nimbusds..")
-        .because("authentication is handled by the security package");
+        .resideInAnyPackage(
+            "io.jsonwebtoken..",
+            "com.auth0.jwt..",
+            "com.nimbusds..",
+            "javax.crypto..")
+        .orShould().dependOnClassesThat()
+        .haveFullyQualifiedName("org.springframework.security.core.context.SecurityContextHolder")
+        .because("authentication, tokens and cryptography are handled by the security package");
 
     // 6. Controllers don't return entities
     @ArchTest
